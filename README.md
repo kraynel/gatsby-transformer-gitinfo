@@ -1,6 +1,6 @@
 # gatsby-transformer-gitinfo
 
-Add some git information on `File` fields: latest commit date, author and email.
+Add some git information on `File` fields from latest commit: date, author and email.
 
 ## Install
 
@@ -16,22 +16,22 @@ In your `gatsby-config.js`
 ```javascript
 module.exports = {
   plugins: [
-    `gatsby-transformer-gitinfo`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
         path: `./src/data/`,
       },
     },
+    `gatsby-transformer-gitinfo`,
   ],
 }
 ```
 
 Where the _source folder_ `./src/data/` is a git versionned directory.
 
-The plugin will add three fields to `File` nodes: `gitDate`, `gitAuthorName` and `gitAuthorEmail`. These fields are relative to the latest commit touching that file.
+The plugin will add three fields to `File` nodes: `gitDate`, `gitAuthorName` and `gitAuthorEmail`. These fields are related to the latest commit touching that file.
 
-If the file is not versionned, these feilds will be `null`.
+If the file is not versionned, these fields will be `null`.
 
 They are exposed in your graphql schema which you can query:
 
@@ -57,7 +57,7 @@ query {
 }
 ```
 
-Now you have a File node to work with:
+Now you have a `File` node to work with:
 
 ```json
 {
@@ -125,6 +125,7 @@ module.exports = {
 }
 ```
 
+## Example
 
 Note: the execution order is first whitelist, then blacklist.
 
