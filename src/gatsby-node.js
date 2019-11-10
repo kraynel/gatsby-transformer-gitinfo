@@ -1,5 +1,4 @@
 const git = require(`simple-git/promise`);
-const _ = require(`lodash`);
 
 async function onCreateNode({ node, actions }, pluginOptions) {
   const { createNodeField } = actions;
@@ -22,35 +21,35 @@ async function onCreateNode({ node, actions }, pluginOptions) {
     return;
   }
 
-  const fileinfo = await git().log({
-    file: node.absolutePath,
-    "max-count": 1,
-    format: {
-      date: `%ai`,
-      authorName: `%an`,
-      authorEmail: "%ae"
-    }
-  });
+  const [remotes, log] = await Promise.all([
+    git(pluginOptions.repoPath).getRemotes(true),
+    git(pluginOptions.repoPath).log({
+      file: node.absolutePath,
+      n: 1,
+      format: {
+        date: `%ai`,
+        authorName: `%an`,
+        authorEmail: "%ae"
+      }
+    })
+  ]);
 
-  if (!fileinfo.latest) {
+  if (!log.latest) {
     return;
   }
 
-  createNodeField({
-    node,
-    name: `gitDate`,
-    value: new Date(fileinfo.latest.date)
-  });
+  const normalizedRemote = remotes.reduce((acc, remote) => {
+    acc[remote.name] = remote.refs;
+    return acc;
+  }, {});
 
   createNodeField({
     node,
-    name: `gitAuthorName`,
-    value: fileinfo.latest.authorName
-  });
-  createNodeField({
-    node,
-    name: `gitAuthorEmail`,
-    value: fileinfo.latest.authorEmail
+    name: `git`,
+    value: {
+      log: { latest: log.latest },
+      remotes: normalizedRemote
+    }
   });
 }
 
