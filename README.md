@@ -41,9 +41,15 @@ query {
     edges {
       node {
         fields {
-          gitDate
-          gitAuthorName
-          gitAuthorEmail
+          git {
+            log {
+              latest {
+                date
+                authorName
+                authorEmail
+              }
+            }
+          }
         }
         internal {
           type
@@ -67,9 +73,15 @@ Now you have a `File` node to work with:
         {
           "node": {
             "fields": {
-              "gitDate": "2019-10-14T12:58:39.000Z",
-              "gitAuthorName": "John Doe",
-              "gitAuthorEmail": "john.doe@github.com"
+              "git": {
+                "log": {
+                  "latest": {
+                    "date": "2019-10-14T12:58:39.000Z",
+                    "authorName":"John Doe",
+                    "authorEmail": "john.doe@github.com"
+                  }
+                }
+              }
             },
             "internal": {
               "contentDigest": "c1644b03f380bc5508456ce91faf0c08",
@@ -127,7 +139,7 @@ module.exports = {
 
 ## Example
 
-Note: the execution order is first whitelist, then blacklist.
+**Note:** the execution order is first whitelist, then blacklist.
 
 ```javascript
 module.exports = {
