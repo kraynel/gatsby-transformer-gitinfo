@@ -29,9 +29,11 @@ module.exports = {
 
 Where the _source folder_ `./src/data/` is a git versionned directory.
 
-The plugin will add three fields to `File` nodes: `gitDate`, `gitAuthorName` and `gitAuthorEmail`. These fields are related to the latest commit touching that file.
+The plugin will add several fields to `File` nodes: `date`, `authorName` and `authorEmail`. These fields are related to the latest commit touching that file.
 
 If the file is not versionned, these fields will be `null`.
+
+You can also fetch the `fetch` and `pull` links of the remote configured on the repository.
 
 They are exposed in your graphql schema which you can query:
 
@@ -41,9 +43,21 @@ query {
     edges {
       node {
         fields {
-          gitDate
-          gitAuthorName
-          gitAuthorEmail
+          git {
+            log {
+              latest {
+                date
+                authorName
+                authorEmail
+              }
+            }
+            remotes {
+              origin {
+                fetch
+                push
+              }
+            }
+          }
         }
         internal {
           type
@@ -67,9 +81,21 @@ Now you have a `File` node to work with:
         {
           "node": {
             "fields": {
-              "gitDate": "2019-10-14T12:58:39.000Z",
-              "gitAuthorName": "John Doe",
-              "gitAuthorEmail": "john.doe@github.com"
+              "git": {
+                "log": {
+                  "latest": {
+                    "date": "2019-10-14T12:58:39.000Z",
+                    "authorName":"John Doe",
+                    "authorEmail": "john.doe@github.com"
+                  }
+                },
+                "remotes": {
+                  "origin": {
+                    "fetch": "git@github.com:kraynel/gatsby-transformer-gitinfo.git",
+                    "push": "git@github.com:kraynel/gatsby-transformer-gitinfo.git",
+                  }
+                }
+              }
             },
             "internal": {
               "contentDigest": "c1644b03f380bc5508456ce91faf0c08",
@@ -88,9 +114,9 @@ Now you have a `File` node to work with:
 
 ## Configuration options
 
-**`whitelist`** [regex][optional]
+**`include`** [regex][optional]
 
-This plugin will try to match the absolute path of the file with the `whitelist` regex.
+This plugin will try to match the absolute path of the file with the `include` regex.
 If it *does not* match, the file will be skipped.
 
 ```javascript
@@ -99,7 +125,7 @@ module.exports = {
     {
       resolve: `gatsby-transformer-gitinfo`,
       options: {
-        whitelist: /\.md$/i, // Only .md files
+        include: /\.md$/i, // Only .md files
       },
     },
   ],
@@ -107,9 +133,9 @@ module.exports = {
 ```
 
 
-**`blacklist`** [regex][optional]
+**`ignore`** [regex][optional]
 
-This plugin will try to match the absolute path of the file with the `blacklist` regex.
+This plugin will try to match the absolute path of the file with the `ignore` regex.
 If it *does* match, the file will be skipped.
 
 ```javascript
@@ -118,16 +144,20 @@ module.exports = {
     {
       resolve: `gatsby-transformer-gitinfo`,
       options: {
-        blacklist: /\.jpeg$/i, // All files except .jpeg
+        ignore: /\.jpeg$/i, // All files except .jpeg
       },
     },
   ],
 }
 ```
 
+**`dir`** [string][optional]
+
+The root of the git repository. Will use current directory if not provided.
+
 ## Example
 
-Note: the execution order is first whitelist, then blacklist.
+**Note:** the execution order is first `ìnclude`, then `ignore`.
 
 ```javascript
 module.exports = {
@@ -135,8 +165,8 @@ module.exports = {
     {
       resolve: `gatsby-transformer-gitinfo`,
       options: {
-        whitelist: /\.md$/i,
-        blacklist: /README/i,  // Will match all .md files, except README.md
+        include: /\.md$/i,
+        ignore: /README/i,  // Will match all .md files, except README.md
       },
     },
   ],

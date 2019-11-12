@@ -1,7 +1,7 @@
 {
   "name": "gatsby-transformer-gitinfo",
-  "description": "Gatsby transformer plugin for git info",
-  "version": "0.1.0",
+  "description": "Gatsby transformer plugin which add git info to File nodes created by gatsby-source-filesystem",
+  "version": "1.0.0-rc1",
   "author": "Kevin Raynel",
   "bugs": {
     "url": "https://github.com/kraynel/gatsby-transformer-gitinfo/issues"
@@ -14,7 +14,8 @@
     "@babel/cli": "^7.6.4",
     "@babel/core": "^7.6.4",
     "babel-preset-gatsby-package": "^0.2.9",
-    "cross-env": "^5.2.1"
+    "cross-env": "^5.2.1",
+    "jest": "^24.9.0"
   },
   "homepage": "https://github.com/kraynel/gatsby-transformer-gitinfo",
   "keywords": [
@@ -33,7 +34,8 @@
   "scripts": {
     "build": "babel src --out-dir . --ignore **/__tests__",
     "prepare": "cross-env NODE_ENV=production npm run build",
-    "watch": "babel -w src --out-dir . --ignore **/__tests__"
+    "watch": "babel -w src --out-dir . --ignore **/__tests__",
+    "test": "jest"
   },
   "engines": {
     "node": ">=8.0.0"

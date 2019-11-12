@@ -1,5 +1,4 @@
 const git = require(`simple-git/promise`);
-const _ = require(`lodash`);
 
 async function onCreateNode({ node, actions }, pluginOptions) {
   const { createNodeField } = actions;
@@ -8,49 +7,44 @@ async function onCreateNode({ node, actions }, pluginOptions) {
     return;
   }
 
-  if (
-    pluginOptions.whitelist &&
-    !pluginOptions.whitelist.test(node.absolutePath)
-  ) {
+  if (pluginOptions.include && !pluginOptions.include.test(node.absolutePath)) {
     return;
   }
 
-  if (
-    pluginOptions.blacklist &&
-    pluginOptions.blacklist.test(node.absolutePath)
-  ) {
+  if (pluginOptions.ignore && pluginOptions.ignore.test(node.absolutePath)) {
     return;
   }
 
-  const fileinfo = await git().log({
-    file: node.absolutePath,
-    "max-count": 1,
-    format: {
-      date: `%ai`,
-      authorName: `%an`,
-      authorEmail: "%ae"
+  const gitRepo = git(pluginOptions.dir);
+  const [remotes, log] = await Promise.all([
+    gitRepo.getRemotes(true),
+    gitRepo.log({
+      file: node.absolutePath,
+      n: 1,
+      format: {
+        date: `%ai`,
+        authorName: `%an`,
+        authorEmail: "%ae"
+      }
+    })
+  ]);
+
+  if (!log.latest) {
+    return;
+  }
+
+  const normalizedRemote = remotes.reduce((acc, remote) => {
+    acc[remote.name] = remote.refs;
+    return acc;
+  }, {});
+
+  createNodeField({
+    node,
+    name: `git`,
+    value: {
+      log: { latest: log.latest },
+      remotes: normalizedRemote
     }
-  });
-
-  if (!fileinfo.latest) {
-    return;
-  }
-
-  createNodeField({
-    node,
-    name: `gitDate`,
-    value: new Date(fileinfo.latest.date)
-  });
-
-  createNodeField({
-    node,
-    name: `gitAuthorName`,
-    value: fileinfo.latest.authorName
-  });
-  createNodeField({
-    node,
-    name: `gitAuthorEmail`,
-    value: fileinfo.latest.authorEmail
   });
 }
 
