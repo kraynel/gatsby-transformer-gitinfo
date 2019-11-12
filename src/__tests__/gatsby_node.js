@@ -102,12 +102,6 @@ describe(`Processing File nodes matching filter regex`, () => {
             authorName: "Some One",
             date: "2018-08-20 20:19:19 +0000"
           }
-        },
-        remotes: {
-          origin: {
-            fetch: "https://some.git.repo",
-            push: "https://some.git.repo"
-          }
         }
       }
     });

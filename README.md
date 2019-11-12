@@ -33,8 +33,6 @@ The plugin will add several fields to `File` nodes: `date`, `authorName` and `au
 
 If the file is not versionned, these fields will be `null`.
 
-You can also fetch the `fetch` and `pull` links of the remote configured on the repository.
-
 They are exposed in your graphql schema which you can query:
 
 ```graphql
@@ -49,12 +47,6 @@ query {
                 date
                 authorName
                 authorEmail
-              }
-            }
-            remotes {
-              origin {
-                fetch
-                push
               }
             }
           }
@@ -87,12 +79,6 @@ Now you have a `File` node to work with:
                     "date": "2019-10-14T12:58:39.000Z",
                     "authorName":"John Doe",
                     "authorEmail": "john.doe@github.com"
-                  }
-                },
-                "remotes": {
-                  "origin": {
-                    "fetch": "git@github.com:kraynel/gatsby-transformer-gitinfo.git",
-                    "push": "git@github.com:kraynel/gatsby-transformer-gitinfo.git",
                   }
                 }
               }
