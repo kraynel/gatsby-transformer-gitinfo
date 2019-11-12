@@ -38,16 +38,25 @@ async function onCreateNode({ node, actions }, pluginOptions) {
 
   const gitRepo = git(pluginOptions.dir);
   const log = await getLogWithRetry(gitRepo, node);
+
   if (!log.latest) {
     return;
   }
 
   createNodeField({
     node,
-    name: `git`,
-    value: {
-      log: { latest: log.latest }
-    }
+    name: `gitLogLatestAuthorName`,
+    value: log.latest.authorName
+  });
+  createNodeField({
+    node,
+    name: `gitLogLatestAuthorEmail`,
+    value: log.latest.authorEmail
+  });
+  createNodeField({
+    node,
+    name: `gitLogLatestDate`,
+    value: log.latest.date
   });
 }
 

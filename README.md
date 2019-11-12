@@ -29,7 +29,7 @@ module.exports = {
 
 Where the _source folder_ `./src/data/` is a git versionned directory.
 
-The plugin will add several fields to `File` nodes: `date`, `authorName` and `authorEmail`. These fields are related to the latest commit touching that file.
+The plugin will add several fields to `File` nodes: `gitLogLatestAuthorName`, `gitLogLatestAuthorEmail` and `gitLogLatestDate`. These fields are related to the latest commit touching that file.
 
 If the file is not versionned, these fields will be `null`.
 
@@ -41,15 +41,9 @@ query {
     edges {
       node {
         fields {
-          git {
-            log {
-              latest {
-                date
-                authorName
-                authorEmail
-              }
-            }
-          }
+          gitLogLatestAuthorName
+          gitLogLatestAuthorEmail
+          gitLogLatestDate
         }
         internal {
           type
@@ -73,15 +67,9 @@ Now you have a `File` node to work with:
         {
           "node": {
             "fields": {
-              "git": {
-                "log": {
-                  "latest": {
-                    "date": "2019-10-14T12:58:39.000Z",
-                    "authorName":"John Doe",
-                    "authorEmail": "john.doe@github.com"
-                  }
-                }
-              }
+              "gitLogLatestAuthorName":"John Doe",
+              "gitLogLatestAuthorEmail": "john.doe@github.com",
+              "gitLogLatestDate": "2019-10-14T12:58:39.000Z"
             },
             "internal": {
               "contentDigest": "c1644b03f380bc5508456ce91faf0c08",
