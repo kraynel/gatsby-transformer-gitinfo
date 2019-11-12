@@ -1,5 +1,26 @@
 const git = require(`simple-git/promise`);
 
+async function getLogWithRetry(gitRepo, node, retry = 2) {
+  // Need retry, see https://github.com/steveukx/git-js/issues/302
+  // Check again after v2 is released?
+
+  const logOptions = {
+    file: node.absolutePath,
+    n: 1,
+    format: {
+      date: `%ai`,
+      authorName: `%an`,
+      authorEmail: "%ae"
+    }
+  };
+  const log = await gitRepo.log(logOptions);
+  if (!log.latest && retry > 0) {
+    return getLogWithRetry(gitRepo, node, retry - 1);
+  }
+
+  return log;
+}
+
 async function onCreateNode({ node, actions }, pluginOptions) {
   const { createNodeField } = actions;
 
@@ -16,35 +37,26 @@ async function onCreateNode({ node, actions }, pluginOptions) {
   }
 
   const gitRepo = git(pluginOptions.dir);
-  const [remotes, log] = await Promise.all([
-    gitRepo.getRemotes(true),
-    gitRepo.log({
-      file: node.absolutePath,
-      n: 1,
-      format: {
-        date: `%ai`,
-        authorName: `%an`,
-        authorEmail: "%ae"
-      }
-    })
-  ]);
+  const log = await getLogWithRetry(gitRepo, node);
 
   if (!log.latest) {
     return;
   }
 
-  const normalizedRemote = remotes.reduce((acc, remote) => {
-    acc[remote.name] = remote.refs;
-    return acc;
-  }, {});
-
   createNodeField({
     node,
-    name: `git`,
-    value: {
-      log: { latest: log.latest },
-      remotes: normalizedRemote
-    }
+    name: `gitLogLatestAuthorName`,
+    value: log.latest.authorName
+  });
+  createNodeField({
+    node,
+    name: `gitLogLatestAuthorEmail`,
+    value: log.latest.authorEmail
+  });
+  createNodeField({
+    node,
+    name: `gitLogLatestDate`,
+    value: log.latest.date
   });
 }
 

@@ -91,25 +91,21 @@ describe(`Processing File nodes matching filter regex`, () => {
       include: /md/,
       dir: dummyRepoPath
     });
-    expect(createNodeField).toHaveBeenCalledTimes(1);
+    expect(createNodeField).toHaveBeenCalledTimes(3);
     expect(createNodeField).toHaveBeenCalledWith({
       node,
-      name: `git`,
-      value: {
-        log: {
-          latest: {
-            authorEmail: "some@one.com",
-            authorName: "Some One",
-            date: "2018-08-20 20:19:19 +0000"
-          }
-        },
-        remotes: {
-          origin: {
-            fetch: "https://some.git.repo",
-            push: "https://some.git.repo"
-          }
-        }
-      }
+      name: `gitLogLatestAuthorName`,
+      value: `Some One`
+    });
+    expect(createNodeField).toHaveBeenCalledWith({
+      node,
+      name: `gitLogLatestAuthorEmail`,
+      value: `some@one.com`
+    });
+    expect(createNodeField).toHaveBeenCalledWith({
+      node,
+      name: `gitLogLatestDate`,
+      value: `2018-08-20 20:19:19 +0000`
     });
   });
 
