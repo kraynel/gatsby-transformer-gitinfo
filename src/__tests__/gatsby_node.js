@@ -18,6 +18,7 @@ beforeEach(() => {
 
   node = {
     absolutePath: `/some/path/file.mdx`,
+    dir: `/some/path`,
     id: `whatever`,
     parent: null,
     children: [],
@@ -39,24 +40,24 @@ describe(`Processing nodes not matching initial filtering`, () => {
     expect(createNodeField).not.toHaveBeenCalled();
   });
 
-  it(`should not add any field when full path is not in whitelist`, async () => {
+  it(`should not add any field when full path is not in include`, async () => {
     await onCreateNode(createNodeSpec, {
-      whitelist: /notmatching/
+      include: /notmatching/
     });
     expect(createNodeField).not.toHaveBeenCalled();
   });
 
-  it(`should not add any field when full path is in blacklist`, async () => {
+  it(`should not add any field when full path is in ignore`, async () => {
     await onCreateNode(createNodeSpec, {
-      blacklist: /some\/path\/file/
+      ignore: /some\/path\/file/
     });
     expect(createNodeField).not.toHaveBeenCalled();
   });
 
-  it(`should not add any field when full path is in whitelist and in blacklist`, async () => {
+  it(`should not add any field when full path is in include and in ignore`, async () => {
     await onCreateNode(createNodeSpec, {
-      whitelist: /mdx/,
-      blacklist: /some\/path\/file/
+      include: /mdx/,
+      ignore: /some\/path\/file/
     });
     expect(createNodeField).not.toHaveBeenCalled();
   });
@@ -85,9 +86,10 @@ describe(`Processing File nodes matching filter regex`, () => {
 
   it("should add log and remote git info to commited File node", async () => {
     node.absolutePath = `${dummyRepoPath}/README.md`;
+    node.dir = dummyRepoPath;
     await onCreateNode(createNodeSpec, {
-      whitelist: /md/,
-      repoPath: dummyRepoPath
+      include: /md/,
+      dir: dummyRepoPath
     });
     expect(createNodeField).toHaveBeenCalledTimes(1);
     expect(createNodeField).toHaveBeenCalledWith({
@@ -113,9 +115,10 @@ describe(`Processing File nodes matching filter regex`, () => {
 
   it("should not add log or remote git info to unversionned File node", async () => {
     node.absolutePath = `${dummyRepoPath}/unversionned`;
+    node.dir = dummyRepoPath;
     await onCreateNode(createNodeSpec, {
-      whitelist: /unversionned/,
-      repoPath: dummyRepoPath
+      include: /unversionned/,
+      dir: dummyRepoPath
     });
     expect(createNodeField).not.toHaveBeenCalled();
   });

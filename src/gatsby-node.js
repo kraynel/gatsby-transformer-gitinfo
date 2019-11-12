@@ -7,23 +7,18 @@ async function onCreateNode({ node, actions }, pluginOptions) {
     return;
   }
 
-  if (
-    pluginOptions.whitelist &&
-    !pluginOptions.whitelist.test(node.absolutePath)
-  ) {
+  if (pluginOptions.include && !pluginOptions.include.test(node.absolutePath)) {
     return;
   }
 
-  if (
-    pluginOptions.blacklist &&
-    pluginOptions.blacklist.test(node.absolutePath)
-  ) {
+  if (pluginOptions.ignore && pluginOptions.ignore.test(node.absolutePath)) {
     return;
   }
 
+  const gitRepo = git(pluginOptions.dir);
   const [remotes, log] = await Promise.all([
-    git(pluginOptions.repoPath).getRemotes(true),
-    git(pluginOptions.repoPath).log({
+    gitRepo.getRemotes(true),
+    gitRepo.log({
       file: node.absolutePath,
       n: 1,
       format: {
