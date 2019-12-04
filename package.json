@@ -1,7 +1,7 @@
 {
   "name": "gatsby-transformer-gitinfo",
   "description": "Gatsby transformer plugin which add git info to File nodes created by gatsby-source-filesystem",
-  "version": "1.0.0-rc2",
+  "version": "1.1.0",
   "author": "Kevin Raynel",
   "bugs": {
     "url": "https://github.com/kraynel/gatsby-transformer-gitinfo/issues"
