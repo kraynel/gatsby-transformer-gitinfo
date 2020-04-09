@@ -7,15 +7,15 @@
     "url": "https://github.com/kraynel/gatsby-transformer-gitinfo/issues"
   },
   "dependencies": {
-    "@babel/runtime": "^7.6.3",
-    "simple-git": "^1.126.0"
+    "@babel/runtime": "7.7.2",
+    "simple-git": "1.126.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.6.4",
-    "@babel/core": "^7.6.4",
-    "babel-preset-gatsby-package": "^0.2.9",
-    "cross-env": "^5.2.1",
-    "jest": "^24.9.0"
+    "@babel/cli": "7.7.0",
+    "@babel/core": "7.7.2",
+    "babel-preset-gatsby-package": "0.2.9",
+    "cross-env": "5.2.1",
+    "jest": "24.9.0"
   },
   "homepage": "https://github.com/kraynel/gatsby-transformer-gitinfo",
   "keywords": [
