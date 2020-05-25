@@ -5,6 +5,7 @@ const git = require("simple-git/promise");
 const { onCreateNode } = require(`../gatsby-node`);
 
 const tmpDir = `./tmp-test/`;
+const iso8601pattern = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)/;
 
 let createNodeField;
 let actions;
@@ -117,5 +118,31 @@ describe(`Processing File nodes matching filter regex`, () => {
       dir: dummyRepoPath
     });
     expect(createNodeField).not.toHaveBeenCalled();
+  });
+
+  it("should use log format options if specified", async () => {
+    node.absolutePath = `${dummyRepoPath}/README.md`;
+    node.dir = dummyRepoPath;
+    await onCreateNode(createNodeSpec, {
+      include: /md/,
+      dir: dummyRepoPath,
+      format: {
+        gitLogLatestCommitDate: `%cI`,
+        gitLogLatestSubject: `%s`
+      }
+    });
+    expect(createNodeField).toHaveBeenCalledTimes(2);
+    expect(createNodeField).toHaveBeenCalledWith(
+      expect.objectContaining({
+        node,
+        name: `gitLogLatestCommitDate`,
+        value: expect.stringMatching(iso8601pattern)
+      })
+    );
+    expect(createNodeField).toHaveBeenCalledWith({
+      node,
+      name: `gitLogLatestSubject`,
+      value: `Add README`
+    });
   });
 });
