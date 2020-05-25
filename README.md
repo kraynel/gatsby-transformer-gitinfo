@@ -129,6 +129,23 @@ module.exports = {
 
 The root of the git repository. Will use current directory if not provided.
 
+**`format`** [object][optional]
+
+The plugin will add fields to the `File` node based on the keys of the format object.
+The values represent which `git log` [format string] to place in each field.
+
+[format string]: https://git-scm.com/docs/pretty-formats#Documentation/pretty-formats.txt-emHem
+
+If not provided, defaults to:
+
+```javascript
+{
+  gitLogLatestDate: `%ai`,
+  gitLogLatestAuthorName: `%an`,
+  gitLogLatestAuthorEmail: "%ae",
+}
+```
+
 ## Example
 
 **Note:** the execution order is first `ìnclude`, then `ignore`.
