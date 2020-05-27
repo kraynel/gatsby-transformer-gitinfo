@@ -1,4 +1,5 @@
 const git = require(`simple-git/promise`);
+const path = require('path');
 
 async function getLogWithRetry(gitRepo, node, retry = 2) {
   // Need retry, see https://github.com/steveukx/git-js/issues/302
@@ -36,7 +37,7 @@ async function onCreateNode({ node, actions }, pluginOptions) {
     return;
   }
 
-  const gitRepo = git(pluginOptions.dir);
+  const gitRepo = git(path.dirname(node.absolutePath));
   const log = await getLogWithRetry(gitRepo, node);
 
   if (!log.latest) {
