@@ -11,6 +11,7 @@ let actions;
 let node;
 let createNodeSpec;
 let dummyRepoPath;
+let dummyRepoSubmodulePath;
 
 beforeEach(() => {
   createNodeField = jest.fn();
@@ -32,6 +33,17 @@ beforeEach(() => {
     actions
   };
 });
+
+const initGitRepo = async (path, username, useremail, remote) => {
+  const gitRepo = git(path);
+
+  await gitRepo.init();
+  await gitRepo.addConfig("user.name", username);
+  await gitRepo.addConfig("user.email", useremail);
+  await gitRepo.addRemote("origin", remote);
+
+  return gitRepo;
+}
 
 describe(`Processing nodes not matching initial filtering`, () => {
   it(`should not add any field when internal type is not 'File'`, async () => {
@@ -69,19 +81,45 @@ describe(`Processing File nodes matching filter regex`, () => {
       path.join(os.tmpdir(), "gatsby-transform-gitinfo-")
     );
 
-    const gitRepo = git(dummyRepoPath);
-    await gitRepo.init();
-    await gitRepo.addConfig("user.name", "Some One");
-    await gitRepo.addConfig("user.email", "some@one.com");
-    await gitRepo.addRemote("origin", "https://some.git.repo");
+    const gitRepo = await initGitRepo(
+      dummyRepoPath,
+      "Some One",
+      "some@one.com",
+      "https://some.git.repo",
+    );
 
     fs.writeFileSync(`${dummyRepoPath}/README.md`, "Hello");
     await gitRepo.add("README.md");
-    await gitRepo.commit("Add README", "README.md", {
-      "--date": '"Mon 20 Aug 2018 20:19:19 UTC"'
-    });
+    await gitRepo.commit(
+      "Add README",
+      "README.md", {
+        "--date": '"Mon 20 Aug 2018 20:19:19 UTC"'
+      }
+    );
 
     fs.writeFileSync(`${dummyRepoPath}/unversionned`, "World");
+
+    dummyRepoSubmodulePath = fs.mkdtempSync(
+      path.join(os.tmpdir(), "gatsby-transform-gitinfo-submodule-")
+    );
+
+    const gitRepoSubmodule = await initGitRepo(
+      dummyRepoSubmodulePath,
+      "Some One Else",
+      "someone@else.com",
+      "https://some.other.git.repo",
+    );
+
+    fs.writeFileSync(`${dummyRepoSubmodulePath}/CONTENT.md`, "Hello");
+    await gitRepoSubmodule.add("CONTENT.md");
+    await gitRepoSubmodule.commit(
+      "Add CONTENT",
+      "CONTENT.md", {
+        "--date": '"Mon 20 Aug 2018 20:19:19 UTC"'
+      }
+    );
+
+    await gitRepo.submoduleAdd(dummyRepoSubmodulePath, "submodule")
   });
 
   it("should add log and remote git info to commited File node", async () => {
@@ -101,6 +139,31 @@ describe(`Processing File nodes matching filter regex`, () => {
       node,
       name: `gitLogLatestAuthorEmail`,
       value: `some@one.com`
+    });
+    expect(createNodeField).toHaveBeenCalledWith({
+      node,
+      name: `gitLogLatestDate`,
+      value: `2018-08-20 20:19:19 +0000`
+    });
+  });
+
+  it("should add log and remote git info to file in submodule", async () => {
+    node.absolutePath = `${dummyRepoPath}/submodule/CONTENT.md`;
+    node.dir = dummyRepoPath;
+    await onCreateNode(createNodeSpec, {
+      include: /md/,
+      dir: dummyRepoPath
+    });
+    expect(createNodeField).toHaveBeenCalledTimes(3);
+    expect(createNodeField).toHaveBeenCalledWith({
+      node,
+      name: `gitLogLatestAuthorName`,
+      value: `Some One Else`
+    });
+    expect(createNodeField).toHaveBeenCalledWith({
+      node,
+      name: `gitLogLatestAuthorEmail`,
+      value: `someone@else.com`
     });
     expect(createNodeField).toHaveBeenCalledWith({
       node,
