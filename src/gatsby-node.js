@@ -1,12 +1,23 @@
 const git = require(`simple-git/promise`);
 const path = require('path');
+const fs = require('fs')
 
 async function getLogWithRetry(gitRepo, node, retry = 2) {
   // Need retry, see https://github.com/steveukx/git-js/issues/302
   // Check again after v2 is released?
 
+  const filePath = fs.realpathSync.native(node.absolutePath, (error, resolvedPath) => {
+    if (error) {
+      console.log(error)
+      return
+    }
+    else {
+      return resolvedPath
+    }
+  });
+
   const logOptions = {
-    file: node.absolutePath,
+    file: filePath,
     n: 1,
     format: {
       date: `%ai`,
@@ -37,7 +48,15 @@ async function onCreateNode({ node, actions }, pluginOptions) {
     return;
   }
 
-  const gitRepo = git(path.dirname(node.absolutePath));
+  const gitRepo = git(pluginOptions.dir || fs.realpathSync.native(path.dirname(node.absolutePath), (error, resolvedPath) => {
+    if (error) {
+      console.log(error)
+      return
+    }
+    else {
+      return resolvedPath
+    }
+  }));
   const log = await getLogWithRetry(gitRepo, node);
 
   if (!log.latest) {
