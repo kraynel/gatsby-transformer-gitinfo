@@ -7,12 +7,12 @@
     "url": "https://github.com/kraynel/gatsby-transformer-gitinfo/issues"
   },
   "dependencies": {
-    "@babel/runtime": "7.10.4",
+    "@babel/runtime": "7.25.9",
     "simple-git": "1.132.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.10.4",
-    "@babel/core": "7.10.4",
+    "@babel/cli": "7.25.9",
+    "@babel/core": "7.25.9",
     "babel-preset-gatsby-package": "0.5.1",
     "cross-env": "5.2.1",
     "jest": "24.9.0"
